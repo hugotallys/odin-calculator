@@ -20,11 +20,15 @@ const percentButton = document.querySelector(".percent");
             stackPush(stack, '');
         }
 
+        let pressed = e.target.innerText;
+        if (pressed === '.' && display.innerText.includes('.')) {
+            pressed = '';
+        }
         let p = stackPop(stack);
-        p = p === null ? e.target.innerText : p + e.target.innerText;
+        p = p === null ? pressed : p + pressed;
         stackPush(stack, p);
 
-        display.innerText += e.target.innerText;
+        display.innerText += pressed;
 
         console.log(stack);
     });
