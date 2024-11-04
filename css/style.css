@@ -28,22 +28,15 @@ body {
     border-radius: 10px;
     margin-bottom: 10px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-    min-height: 1.5rem;
 }
 
 .pad {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.btn-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 
 button {
-    flex: 1;
     padding: 15px;
     font-size: 1.5rem;
     font-weight: bold;
@@ -61,12 +54,14 @@ button:active {
     transform: scale(0.95);
 }
 
-button.btn-operator {
+button.btn-operate {
     background-color: #ff8c00;
     color: #fff;
 }
 
-button.clear {
+button.clear,
+button#btn-sign,
+button#btn-percent {
     background-color: #e74c3c;
     color: #fff;
 }
@@ -76,16 +71,22 @@ button.equals {
     color: #fff;
 }
 
-button:not(.btn-operator):not(.clear):not(.equals) {
+button.zero {
+    grid-column: span 2;
+}
+
+button:not(.btn-operate):not(.clear):not(.equals):not(#btn-sign):not(#btn-percent) {
     background-color: #444;
     color: #fff;
 }
 
-button.btn-operator:hover {
+button.btn-operate:hover {
     background-color: #ffa726;
 }
 
-button.clear:hover {
+button.clear:hover,
+button#btn-sign:hover,
+button#btn-percent:hover {
     background-color: #e57373;
 }
 
@@ -93,6 +94,6 @@ button.equals:hover {
     background-color: #2ecc71;
 }
 
-button:not(.btn-operator):not(.clear):not(.equals):hover {
+button:not(.btn-operate):not(.clear):not(.equals):not(#btn-sign):not(#btn-percent):hover {
     background-color: #555;
 }

@@ -1,46 +1,131 @@
-let firstNumber = '1';
-let secondNumber = '1';
-let operation = '+';
+const STACK_MAX_SIZE = 3;
 
-let displayNumber = '0';
+const stack = [];
 
-const digitButtons = document.querySelectorAll(".btn-digit");
 const display = document.querySelector(".display");
+const digitButtons = document.querySelectorAll(".btn-digit");
+const operationButtons = document.querySelectorAll(".btn-operate");
+const equalsButton = document.querySelector(".equals");
+const clearButton = document.querySelector(".clear");
+const signalButton = document.querySelector(".sign");
+const percentButton = document.querySelector(".percent");
 
 [...digitButtons].forEach(digitButton => {
     digitButton.addEventListener("click", (e) => {
-        if (display.innerText === '0')
+        if (display.innerText === '0' || display.innerText === "ERROR")
             display.innerText = '';
+
+        if (isOperator(stackPeek(stack))) {
+            display.innerText = '';
+            stackPush(stack, '');
+        }
+
+        let p = stackPop(stack);
+        p = p === null ? e.target.innerText : p + e.target.innerText;
+        stackPush(stack, p);
+
         display.innerText += e.target.innerText;
+
+        console.log(stack);
     });
 });
-
-const operationButtons = document.querySelectorAll(".btn-operator");
 
 [...operationButtons].forEach(operationButton => {
     operationButton.addEventListener("click", (e) => {
-        firstNumber = display.innerText;
-        display.innerText = '0';
-        operation = e.target.innerText;
+        if (isOperator(stackPeek(stack)))
+            stackPop(stack);
+
+        if (stack.length === STACK_MAX_SIZE) {
+            let secondNumber = stackPop(stack);
+            let operation = stackPop(stack);
+            let firstNumber = stackPop(stack);
+
+            let result = parseFloat(
+                operate(firstNumber, secondNumber, operation).toFixed(8)
+            );
+
+            if (result === Infinity) {
+                result = "ERROR";
+            } else {
+                stackPush(stack, display.innerText);
+            }
+
+            display.innerText = `${result}`;
+        }
+
+        stackPush(stack, e.target.innerText);
+        console.log(stack);
     });
 });
 
-const equalsButton = document.querySelector(".equals");
-
 equalsButton.addEventListener("click", () => {
-    secondNumber = display.innerText;
-    let result = operate(firstNumber, secondNumber, operation);
-    display.innerText = `${result}`;
-});
+    let secondNumber = stackPop(stack);
+    let operation = stackPop(stack);
+    let firstNumber = stackPop(stack);
 
-const clearButton = document.querySelector(".clear");
+    let result = parseFloat(
+        operate(firstNumber, secondNumber, operation).toFixed(8)
+    );
+
+    if (result === Infinity) {
+        result = "ERROR"
+    } else {
+        stackPush(stack, display.innerText);
+        stackPush(stack, operation);
+    }
+
+    display.innerText = `${result}`;
+
+    console.log(stack);
+});
 
 clearButton.addEventListener("click", () => {
-    firstNumber = null;
-    secondNumber = null;
-    operation = null;
     display.innerText = 0;
+
+    for (let i = 0; i < STACK_MAX_SIZE; i++) {
+        stackPop(stack);
+    }
+
+    console.log(stack);
 });
+
+signalButton.addEventListener("click", () => {
+    if (display.innerText[0] === '-') {
+        display.innerText = display.innerText.substring(1);
+    } else {
+        display.innerText = '-' + display.innerText;
+    }
+    stackPop(stack);
+    stackPush(stack, display.innerText);
+    console.log(stack);
+})
+
+percentButton.addEventListener("click", () => {
+    let result = parseFloat(display.innerText);
+    result = parseFloat((result / 100).toFixed(8));
+    display.innerText = `${result}`;
+    stackPop(stack);
+    stackPush(stack, display.innerText);
+    console.log(stack);
+})
+
+function isOperator(symbol) {
+    return '+-x÷'.includes(symbol);
+}
+
+function stackPush(stack, item) {
+    stack.push(item);
+}
+
+function stackPeek(stack) {
+    if (stack.length === 0) return null;
+    return stack[stack.length - 1];
+}
+
+function stackPop(stack) {
+    if (stack.length === 0) return null;
+    return stack.pop();
+}
 
 function add(a, b) {
     return a + b;
@@ -59,8 +144,8 @@ function divide(a, b) {
 }
 
 function operate(firstNumber, secondNumber, operation) {
-    firstNumber = parseInt(firstNumber);
-    secondNumber = parseInt(secondNumber);
+    firstNumber = parseFloat(firstNumber);
+    secondNumber = parseFloat(secondNumber);
 
     switch (operation) {
         case '+':
